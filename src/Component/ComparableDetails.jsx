@@ -57,6 +57,7 @@ const ComparableDetails = () => {
     comparable_details: [
       {
         cre_id: "",
+        infra_proximity: '',
         frontage: "",
         vintage: "",
         nearby_assets: [""],
@@ -71,6 +72,7 @@ const ComparableDetails = () => {
       },
       {
         cre_id: "",
+        infra_proximity: '',
         frontage: "",
         vintage: "",
         nearby_assets: [""],
@@ -85,6 +87,7 @@ const ComparableDetails = () => {
       },
       {
         cre_id: "",
+        infra_proximity: '',
         frontage: "",
         vintage: "",
         nearby_assets: [""],
@@ -99,6 +102,7 @@ const ComparableDetails = () => {
       },
       {
         cre_id: "",
+        infra_proximity: '',
         frontage: "",
         vintage: "",
         nearby_assets: [""],
@@ -167,6 +171,7 @@ const ComparableDetails = () => {
             if (!parsedComparableData[i]) {
               parsedComparableData[i] = {
                 cre_id: "",
+                infra_proximity: '',
                 frontage: "",
                 vintage: "",
                 nearby_assets: [""],
@@ -231,9 +236,10 @@ const ComparableDetails = () => {
       } else {
         seenIds.add(comparable.cre_id); // Add the ID to the set if it's not a duplicate
       }
+
       if (!comparable.cre_id) comparableErrors.cre_id = 'Required';
       if (!comparable.proximity) comparableErrors.proximity = 'Required';
-      if (!comparable.frontage) comparableErrors.frontage = 'Required';
+      // if (!comparable.frontage) comparableErrors.frontage = 'Required';
       if (!comparable.vintage) comparableErrors.vintage = 'Required';
       // if (!comparable.nearby_assets || comparable.nearby_assets.length === 0 || !comparable.nearby_assets[0]) {
       //   comparableErrors.nearby_assets = 'Required';
@@ -263,6 +269,12 @@ const ComparableDetails = () => {
         comparablesState[index].otherImages.length === 0 ||
         !comparablesState[index].otherImages.some(img => img instanceof File || img instanceof Blob)) {
         comparableErrors.otherImages = 'At least one other image is required';
+      }
+
+      if (!comparablesState[index].annexureImages ||
+        comparablesState[index].annexureImages.length === 0 ||
+        !comparablesState[index].annexureImages.some(img => img instanceof File || img instanceof Blob)) {
+        comparableErrors.annexureImages = 'At least one Annexure image is required';
       }
 
 
@@ -348,10 +360,17 @@ const ComparableDetails = () => {
 
       setComparablesState(prevState => {
         const newState = [...prevState];
+        const updatedOtherImages = [
+          ...(newState[comparableIndex].otherImages || []),
+          ...newFiles
+        ];
+
+        // Ensure no more than 5 images are kept
         newState[comparableIndex] = {
           ...newState[comparableIndex],
-          otherImages: [...(prevState[comparableIndex].otherImages || []), ...newFiles]
+          otherImages: updatedOtherImages.slice(0, 5) // Keep only the first 5 images
         };
+
         return newState;
       });
     }
@@ -400,17 +419,27 @@ const ComparableDetails = () => {
 
   const annexureImagesHandleChange = (e, comparableIndex) => {
     if (e.target.files) {
+      // Collect the new files, limit to 5
       const newFiles = Array.from(e.target.files).slice(0, 5);
+
       setComparablesState(prevState => {
         const newState = [...prevState];
+        const updatedAnnexureImages = [
+          ...(newState[comparableIndex].annexureImages || []),
+          ...newFiles
+        ];
+
+        // Ensure no more than 5 annexure images are stored
         newState[comparableIndex] = {
           ...newState[comparableIndex],
-          annexureImages: [...(newState[comparableIndex].annexureImages || []), ...newFiles]
+          annexureImages: updatedAnnexureImages.slice(0, 5) // Limit to first 5 images
         };
+
         return newState;
       });
     }
   };
+
 
   const deleteAnnexureImages = (comparableIndex, imageIndex) => {
     setComparablesState(prevState => {
@@ -479,6 +508,7 @@ const ComparableDetails = () => {
 
 
   const handleSubmit = async (values) => {
+    console.log("HEllo")
     setLoader(true)
     const formData = new FormData();
 
@@ -494,6 +524,7 @@ const ComparableDetails = () => {
       if (comparable.cre_id || state.convertedImage) {
         return {
           cre_id: comparable.cre_id,
+          infra_proximity: comparable.infra_proximity,
           frontage: comparable.frontage,
           vintage: comparable.vintage,
           key_obervations: comparable.key_obervations,
@@ -585,10 +616,19 @@ const ComparableDetails = () => {
                               className="error"
                             />
                           </div>
+                          <div className="formGridInner">
+                            <label htmlFor={`comparable_details.${index}.infra_proximity`}>
+                              Infra Proximity
+                            </label>
+                            <Field
+                              type="text"
+                              name={`comparable_details.${index}.infra_proximity`}
+                            />
+                          </div>
 
                           <div className="formGridInner">
                             <label htmlFor={`comparable_details.${index}.frontage`}>
-                              Frontage (Feet) {index < 2 && <span className="required">*</span>}
+                              Frontage (Feet)
                             </label>
                             <Field
                               type="number"
@@ -703,7 +743,7 @@ const ComparableDetails = () => {
                                           onCropChange={setCurrentCrop}
                                           onCropComplete={onCropComplete}
                                           onZoomChange={setCurrentZoom}
-                                          // style={{ height: "512px" }}
+                                        // style={{ height: "512px" }}
                                         />
                                         <button
                                           onClick={showCroppedImage}
@@ -774,8 +814,7 @@ const ComparableDetails = () => {
                                     {!comparablesState[index].otherImages.length > 0 &&
                                       errors?.comparable_details?.[index]?.otherImages && (
                                         <div className="error">{errors.comparable_details[index].otherImages}</div>
-                                      )
-                                    }
+                                      )}
                                   </div>
 
                                 </div>
@@ -804,17 +843,23 @@ const ComparableDetails = () => {
                                     </button>
                                   </div>
                                 ))}
-                                {comparablesState[index].annexureImages.length < 5 && (
-                                  <div className="position-relative customInputBox">
-                                    <input
-                                      type="file"
-                                      accept="image/png, image/gif, image/jpeg"
-                                      multiple
-                                      onChange={(e) => annexureImagesHandleChange(e, index)}
-                                    />
-                                    <Icon icon="ph:plus-bold" />
-                                  </div>
-                                )}
+                                <div className="position-relative">
+                                  {comparablesState[index].annexureImages.length < 5 && (
+                                    <div className="position-relative customInputBox">
+                                      <input
+                                        type="file"
+                                        accept="image/png, image/gif, image/jpeg"
+                                        multiple
+                                        onChange={(e) => annexureImagesHandleChange(e, index)}
+                                      />
+                                      <Icon icon="ph:plus-bold" />
+                                    </div>
+                                  )}
+                                  {!comparablesState[index].annexureImages.length > 0 &&
+                                    errors?.comparable_details?.[index]?.annexureImages && (
+                                      <div className="error">{errors.comparable_details[index].annexureImages}</div>
+                                    )}
+                                </div>
                               </div>
 
                               <ErrorMessage

@@ -43,61 +43,30 @@ function PdfReader({ url }) {
                 <>
                     <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
                         <Page pageNumber={pageNumberView} />
+                        <div className="pdf-pagination d-flex align-items-center justify-content-around">
+                            <button
+                                type="button"
+                                disabled={pageNumberView <= 1}
+                                onClick={previousPage}
+                            >
+                                <Icon icon="ant-design:left-outlined" />
+                            </button>
+                            <p>
+                                {pageNumberView} of {numPages}
+                            </p>
+                            <button
+                                type="button"
+                                disabled={pageNumberView >= numPages}
+                                onClick={nextPage}
+                            >
+                                <Icon icon="ant-design:right-outlined" />
+                            </button>
+                        </div>
+                        <div className="downloadButtonWithLink mt-4 mb-2 d-flex flex-column align-items-center gap-2">
+                            <button onClick={downloadGeneratedPdf}>Download Report</button>
+                            {window.location.pathname !== "/" && <Link to={"/"}>Back to Home</Link>}
+                        </div>
                     </Document>
-                    <div className="pdf-pagination d-flex align-items-center justify-content-around">
-                        {/* <button
-                            type="button"
-                            disabled={pageNumberView >= numPages}
-                            onClick={nextPage}
-                        >
-                            First Page
-                        </button>
-                        <button
-                            type="button"
-                            disabled={pageNumberView <= 1}
-                            onClick={previousPage}
-                        >
-                            <Icon icon="ant-design:left-outlined" />
-                        </button>
-                        <p>
-                            Page {pageNumberView} of {numPages}
-                        </p>
-                        <button
-                            type="button"
-                            disabled={pageNumberView >= numPages}
-                            onClick={nextPage}
-                        >
-                            <Icon icon="ant-design:right-outlined" />
-                        </button>
-                        <button
-                            type="button"
-                            disabled={pageNumberView >= numPages}
-                            onClick={nextPage}
-                        >
-                            Last Page
-                        </button> */}
-                        <button
-                            type="button"
-                            disabled={pageNumberView <= 1}
-                            onClick={previousPage}
-                        >
-                            <Icon icon="ant-design:left-outlined" />
-                        </button>
-                        <p>
-                            {pageNumberView} of {numPages}
-                        </p>
-                        <button
-                            type="button"
-                            disabled={pageNumberView >= numPages}
-                            onClick={nextPage}
-                        >
-                            <Icon icon="ant-design:right-outlined" />
-                        </button>
-                    </div>
-                    <div className="downloadButtonWithLink mt-4 d-flex flex-column align-items-center gap-2">
-                        <button onClick={downloadGeneratedPdf}>Download Report</button>
-                        <Link to={"/"}>Back to Home</Link>
-                    </div>
                 </>
             )}
         </div>

@@ -680,6 +680,11 @@ form .formGridParent .customInputBox input {
   color: #333333;
 }
 
+.rdt_Table .rdt_TableRow div[data-tag="allowRowEvents"] .clrBlue {
+  color: #1C6FF4;
+  cursor: pointer;
+}
+
 .comparePageGrid.formGridParent.withNoGrid {
   background: #EBF3FF;
   padding: 20px;
@@ -878,6 +883,7 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   color: #fff;
 }
 
+.modal canvas,
 .recommendationPageR canvas {
   all: unset !important;
   width: 100% !important;
@@ -885,8 +891,21 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   height: 477px !important;
 }
 
+.modal .textLayer,
 .recommendationPageR .textLayer {
   height: fit-content !important;
+}
+
+.modal {
+  overflow: hidden;
+}
+
+.modal .modal-content{
+  width: 76%;
+}
+
+.modal .recommendationPageR {
+  padding: 15px;
 }
 
 .recommendationPageR button {
@@ -947,3 +966,20 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   color: #1C6FF4;
   text-decoration: none;
 }
+
+.modal-header button{
+  border-radius: 100%;
+  background: #F5F5F5;
+  /* justify-content: space-between; */
+  border: none;
+  outline: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-content: center;
+}
+
+/* .reactEasyCrop_CropArea.reactEasyCrop_CropAreaGrid{
+  width: 1164px !important;
+  height: 800px !important;
+} */

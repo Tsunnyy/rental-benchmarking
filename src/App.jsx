@@ -13,6 +13,9 @@ import LeafLetMap from './Component/LeafLetMap';
 import Loader from './Component/Loader';
 import Select from 'react-select';
 import CsvDownloadButton from 'react-json-to-csv'
+import { Modal } from 'react-bootstrap';
+import { PdfReader } from './Component/PdfReader';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 function App() {
 
@@ -21,6 +24,11 @@ function App() {
   const [sortBy, setSortBy] = useState("asc")
   const [listStatus, setListStatus] = useState(2)
   const [searchData, setSearchData] = useState("")
+  const [pdfUrl, setpdfUrl] = useState("")
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   let navigate = useNavigate();
 
   const editListing = (id, completed_step) => {
@@ -53,7 +61,6 @@ function App() {
   }
 
   const downloadReport = async (id) => {
-    // console.log(id)
     if (id) {
       try {
         setLoader(true);
@@ -62,6 +69,24 @@ function App() {
         );
         // console.log(reportResponse.data.data.report_full_path)
         downloadGeneratedPdf(reportResponse.data.data.report_full_path)
+        // setpdfUrl(reportResponse.data.data.report_full_path)
+      } catch (error) {
+        console.error('Error generating report:', error);
+      } finally {
+        setLoader(false);
+      }
+    }
+  }
+
+  const getPdfUrl = async (id) => {
+    if (id) {
+      try {
+        setLoader(true);
+        const reportResponse = await axios.get(
+          `http://3.7.95.255:81/api/rental_benchmarking/generate_report?id=${id}`
+        );
+        setpdfUrl(reportResponse.data.data.report_full_path)
+        setShow(true)
       } catch (error) {
         console.error('Error generating report:', error);
       } finally {
@@ -80,7 +105,12 @@ function App() {
     {
       name: 'Client Name',
       selector: row => row.client_name,
-      cellExport: (row) => row.client_name,
+      cell: row => (
+        <>
+          {row.status == "Completed" ? <h2 className='clrBlue' onClick={() => getPdfUrl(row.id)}>{row.client_name}</h2> : <h2>{row.client_name}</h2>}
+        </>
+      ),
+      // cellExport: (row) => row.client_name,
     },
     {
       name: 'Subject Site Address',
@@ -223,6 +253,7 @@ function App() {
                   <DataTable
                     columns={columns}
                     data={rowData}
+                    // onRowClicked={}
                     noHeader
                     defaultSortField="id"
                     defaultSortAsc={false}
@@ -304,6 +335,18 @@ function App() {
         </Routes>
 
       </div>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header className='justify-content-between'>
+          <h4></h4>
+          <button onClick={handleClose} className="closeButton">
+            <Icon icon="material-symbols:close" />
+          </button>
+        </Modal.Header>
+        <div className="recommendationPageR">
+          <PdfReader url={pdfUrl} />
+        </div>
+      </Modal>
     </>
   )
 }

@@ -37,6 +37,8 @@ const SubjectDetsils = () => {
         completed_step: 1,
         client_name: '',
         request_at: '',
+        site_visit_at: '',
+        infra_proximity: '',
         contact_person: '',
         subject_cre_id: '',
         subject_area_details: [
@@ -44,6 +46,7 @@ const SubjectDetsils = () => {
         ],
         subject_gmap_location: '',
         subject_address: '',
+        subject_footer_address: '',
         subject_lat: '',
         subject_long: '',
         subject_property_type: '',
@@ -170,14 +173,21 @@ const SubjectDetsils = () => {
         const newFiles = [];
         for (let i = 0; i < e.target.files.length && i < 5; i++) {
             newFiles.push(e.target.files[i]);
+            // if (e.target.files[i] > 5) {
+            //     newFiles.slice(0, 4)
+            // }
             console.log(i, "iiiii")
             console.log(otherImages, "OtherImages")
             // console.log(newFiles, "newFiles")
         }
-        setOtherImages((prevImages) => [
-            ...prevImages,
-            ...newFiles
-        ]);
+        // setOtherImages((prevImages) => [
+        //     ...prevImages,
+        //     ...newFiles
+        // ]);
+        setOtherImages((prevImages) => {
+            const allImages = [...prevImages, ...newFiles];
+            return allImages.slice(0, 5);
+        });
     };
 
 
@@ -205,6 +215,15 @@ const SubjectDetsils = () => {
                 if (!values.client_name) {
                     errors.client_name = 'Client Name is required';
                 }
+                if (!values.site_visit_at) {
+                    errors.site_visit_at = 'Required';
+                }
+                if (!values.subject_footer_address) {
+                    errors.subject_footer_address = 'Subject Footer Address Required';
+                } else if (values.subject_footer_address.length > 100) {
+                    errors.subject_footer_address = 'Maximum 100 characters';
+                }
+
                 if (!values.request_at) {
                     errors.request_at = 'Date of Request is required';
                 }
@@ -335,9 +354,9 @@ const SubjectDetsils = () => {
                 } else if (values.subject_efficiency < 0 || values.subject_efficiency > 100) {
                     errors.subject_efficiency = 'Efficiency must be between 0 and 100';
                 }
-                if (!values.subject_frontage) {
-                    errors.subject_frontage = 'Frontage is required';
-                }
+                // if (!values.subject_frontage) {
+                //     errors.subject_frontage = 'Frontage is required';
+                // }
                 if (!values.subject_vintage) {
                     errors.subject_vintage = 'Vintage of Property is required';
                 }
@@ -353,6 +372,9 @@ const SubjectDetsils = () => {
                 }
                 postdata.append("completed_step", "1");
                 postdata.append("client_name", values.client_name);
+                postdata.append("site_visit_at", values.site_visit_at);
+                postdata.append("infra_proximity", values.infra_proximity);
+                postdata.append("subject_footer_address", values.subject_footer_address);
                 postdata.append("request_at", values.request_at);
                 postdata.append("contact_person", values.contact_person);
                 postdata.append("subject_cre_id", values.subject_cre_id);
@@ -434,6 +456,14 @@ const SubjectDetsils = () => {
                                 <ErrorMessage className='error' name="client_name" component="p" />
                             </div>
                             <div className="formGridInner">
+                                <label htmlFor="contact_person">Contact Person @ Client (Optional)</label>
+                                <Field
+                                    type="text"
+                                    name="contact_person"
+                                />
+                                <ErrorMessage className='error' name="contact_person" component="p" />
+                            </div>
+                            <div className="formGridInner">
                                 <label htmlFor="request_at">Date of Request<span className="required">*</span></label>
                                 <Field
                                     type="date"
@@ -442,13 +472,22 @@ const SubjectDetsils = () => {
                                 <ErrorMessage className='error' name="request_at" component="p" />
                             </div>
                             <div className="formGridInner">
-                                <label htmlFor="contact_person">Contact Person @ Client (Optional)</label>
+                                <label htmlFor="site_visit_at">Site Visit at<span className="required">*</span></label>
+                                <Field
+                                    type="date"
+                                    name="site_visit_at"
+                                />
+                                <ErrorMessage className='error' name="site_visit_at" component="p" />
+                            </div>
+                            <div className="formGridInner">
+                                <label htmlFor="infra_proximity">Infra Proximity</label>
                                 <Field
                                     type="text"
-                                    name="contact_person"
+                                    name="infra_proximity"
                                 />
-                                <ErrorMessage className='error' name="contact_person" component="p" />
+                                <ErrorMessage className='error' name="infra_proximity" component="p" />
                             </div>
+
                             <div className="formGridInner">
                                 <label htmlFor="subject_cre_id">CRE ID of Subject Site (Optional)</label>
                                 <Field
@@ -510,7 +549,7 @@ const SubjectDetsils = () => {
                                 />
                                 <hr />
                             </div>
-                            <div className="formGridInner">
+                            <div className="full formGridInner">
                                 <label htmlFor="subject_gmap_location">Enter Google Location of Site Here<span className="required">*</span></label>
                                 <Field
                                     type="text"
@@ -525,6 +564,14 @@ const SubjectDetsils = () => {
                                     name="subject_address"
                                 />
                                 <ErrorMessage className='error' name="subject_address" component="p" />
+                            </div>
+                            <div className="formGridInner">
+                                <label htmlFor="subject_footer_address">Footer Address<span className="required">*</span></label>
+                                <Field
+                                    type="text"
+                                    name="subject_footer_address"
+                                />
+                                <ErrorMessage className='error' name="subject_footer_address" component="p" />
                             </div>
                             <div className="formGridInner">
                                 <label htmlFor="subject_lat">Latitude<span className="required">*</span></label>
@@ -554,6 +601,7 @@ const SubjectDetsils = () => {
                                     <option value="commercial">Commercial</option>
                                     <option value="residential">Residential</option>
                                     <option value="industrial">Industrial</option>
+                                    <option value="highstreet">Highstreet</option>
                                 </Field>
                                 <ErrorMessage className='error' name="subject_property_type" component="p" />
                             </div>
@@ -602,7 +650,7 @@ const SubjectDetsils = () => {
                                                             onCropChange={setCrop}
                                                             onCropComplete={onCropComplete}
                                                             onZoomChange={setZoom}
-                                                            cropSize={{ height: 500, width: 1153 }}
+                                                            cropSize={{ width: 500, height: 500 }}
                                                         />
                                                         <button
                                                             onClick={showCroppedImage}
@@ -714,7 +762,7 @@ const SubjectDetsils = () => {
                                 />
                             </div>
                             <div className="formGridInner">
-                                <label htmlFor="subject_frontage">Frontage (Feet)<span className="required">*</span></label>
+                                <label htmlFor="subject_frontage">Frontage (Feet)</label>
                                 <Field
                                     type="number"
                                     name="subject_frontage"
