@@ -29,6 +29,9 @@ function App() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const apiUrl = import.meta.env.VITE_API_KEY;
+
   let navigate = useNavigate();
 
   const editListing = (id, completed_step) => {
@@ -65,7 +68,7 @@ function App() {
       try {
         setLoader(true);
         const reportResponse = await axios.get(
-          `http://3.7.95.255:81/api/rental_benchmarking/generate_report?id=${id}`
+          `${apiUrl}/api/rental_benchmarking/generate_report?id=${id}`
         );
         // console.log(reportResponse.data.data.report_full_path)
         downloadGeneratedPdf(reportResponse.data.data.report_full_path)
@@ -83,7 +86,7 @@ function App() {
       try {
         setLoader(true);
         const reportResponse = await axios.get(
-          `http://3.7.95.255:81/api/rental_benchmarking/generate_report?id=${id}`
+          `${apiUrl}/api/rental_benchmarking/generate_report?id=${id}`
         );
         setpdfUrl(reportResponse.data.data.report_full_path)
         setShow(true)
@@ -146,7 +149,7 @@ function App() {
 
   const getRowsData = () => {
     setLoader(true)
-    axios.get(`http://3.7.95.255:81/api/rental_benchmarking/list_reports?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`).then((response) => {
+    axios.get(`${apiUrl}/api/rental_benchmarking/list_reports?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`).then((response) => {
       let responseData = response.data.data
       console.log(responseData, "data")
       responseData.map((val) => {
@@ -196,7 +199,7 @@ function App() {
   }
 
   const downloadCsvFild = async () => {
-    const response = await axios.get(`http://3.7.95.255:81/api/rental_benchmarking/export?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`)
+    const response = await axios.get(`${apiUrl}/api/rental_benchmarking/export?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`)
     let responseData = response.data.data
     const csv = convertJSONToCSV(responseData);
     downloadCSV(csv);
@@ -226,8 +229,8 @@ function App() {
   return (
     <>
       <Loader loader={loader} />
-      <div className={window.location.pathname != "/" ? "mainDashboard" : "mainDashboardWithoutAside"}>
-        {window.location.pathname != "/" ? <Aside /> : ""}
+      <div className={window.location.pathname != "/rental-benchmarking" ? "mainDashboard" : "mainDashboardWithoutAside"}>
+        {window.location.pathname != "/rental-benchmarking" ? <Aside /> : ""}
         <Routes>
           <Route path="/" element={
             <div className="dasboardRightSide">

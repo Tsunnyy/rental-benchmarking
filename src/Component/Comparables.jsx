@@ -11,6 +11,8 @@ const Comparables = () => {
         comparable_cre_ids: ['', '', '', '']
     };
 
+    const apiUrl = import.meta.env.VITE_API_KEY;
+
     let navigate = useNavigate();
 
     return (
@@ -36,7 +38,7 @@ const Comparables = () => {
 
                     axios({
                         method: 'POST',
-                        url: 'http://3.7.95.255:81//api/rental_benchmarking/save_report_data',
+                        url: `${apiUrl}//api/rental_benchmarking/save_report_data`,
                         data: formData
                     })
                         .then(function (res) {

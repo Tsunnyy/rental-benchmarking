@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+  <BrowserRouter basename='/rental-benchmarking'>
+    <App />
+  </BrowserRouter>
 )

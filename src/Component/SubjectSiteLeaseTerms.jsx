@@ -28,6 +28,8 @@ const SubjectSiteLeaseTerms = () => {
   //   subject_cagr_analysis: '',
   // };
 
+  const apiUrl = import.meta.env.VITE_API_KEY;
+
   const navigate = useNavigate();
 
   let { id } = useParams();
@@ -37,7 +39,7 @@ const SubjectSiteLeaseTerms = () => {
       const fetchData = async () => {
         setLoader(true)
         try {
-          const response = await axios.get(`http://3.7.95.255:81/api/rental_benchmarking/get_report_data?id=${id}`);
+          const response = await axios.get(`${apiUrl}/api/rental_benchmarking/get_report_data?id=${id}`);
           const data = response.data.data;
           console.log(data, "Fetched data");
 
@@ -109,7 +111,7 @@ const SubjectSiteLeaseTerms = () => {
     try {
       axios({
         method: 'POST',
-        url: 'http://3.7.95.255:81/api/rental_benchmarking/save_report_data',
+        url: `${apiUrl}/api/rental_benchmarking/save_report_data`,
         data: formData
       })
         .then(function (res) {

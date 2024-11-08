@@ -5,11 +5,12 @@ import axios from 'axios';
 
 const LeafLetMap = () => {
     const [subjectLatLongData, setSubjectLatLongData] = useState([]);
+    const apiUrl = import.meta.env.VITE_API_KEY;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://3.7.95.255:81/api/rental_benchmarking/get_subject_latlong');
+                const response = await axios.get(`${apiUrl}/api/rental_benchmarking/get_subject_latlong`);
                 const data = response.data.data;
                 setSubjectLatLongData(data);
             } catch (e) {

@@ -18,12 +18,14 @@ const RecommendedRentals = () => {
     const [pdfUrl, setPdfUrl] = useState(undefined);
     const { id } = useParams();
 
+    const apiUrl = import.meta.env.VITE_API_KEY;
+
     useEffect(() => {
         const fetchInitialData = async () => {
             setLoader(true);
             try {
                 // Fetching the recommended rentals initially
-                const response = await axios.get('http://3.7.95.255:81/api/rental_benchmarking/get_recommended_rentals');
+                const response = await axios.get(`${apiUrl}/api/rental_benchmarking/get_recommended_rentals`);
                 setRentValues((prevValues) => ({
                     ...prevValues,
                     ...response.data.data, // Update state with fetched rent values
@@ -31,7 +33,7 @@ const RecommendedRentals = () => {
 
                 if (id) {
                     const reportResponse = await axios.get(
-                        `http://3.7.95.255:81/api/rental_benchmarking/get_report_data?id=${id}`
+                        `${apiUrl}/api/rental_benchmarking/get_report_data?id=${id}`
                     );
                     setRentValues((prevValues) => ({
                         ...prevValues,
@@ -72,7 +74,7 @@ const RecommendedRentals = () => {
 
         try {
             const response = await axios.post(
-                'http://3.7.95.255:81/api/rental_benchmarking/save_report_data',
+                `${apiUrl}/api/rental_benchmarking/save_report_data`,
                 formData
             );
             console.log('Form submitted successfully:', response);
@@ -84,7 +86,7 @@ const RecommendedRentals = () => {
                 try {
                     setLoader(true);
                     const reportResponse = await axios.get(
-                        `http://3.7.95.255:81/api/rental_benchmarking/generate_report?id=${id}`
+                        `${apiUrl}/api/rental_benchmarking/generate_report?id=${id}`
                     );
                     setPdfUrl(reportResponse.data.data.report_full_path);
                 } catch (error) {
@@ -97,7 +99,7 @@ const RecommendedRentals = () => {
     };
 
     const getInitialValues = () => {
-        axios.get('http://3.7.95.255:81/api/rental_benchmarking/get_recommended_rentals').then((response) => {
+        axios.get(`${apiUrl}/api/rental_benchmarking/get_recommended_rentals`).then((response) => {
             setRentValues((prevValues) => ({
                 ...prevValues,
                 ...response.data.data,

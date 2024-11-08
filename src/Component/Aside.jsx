@@ -9,6 +9,8 @@ const Aside = () => {
     const [completedStep, setCompletedStep] = useState(0);
     const [currentId, setCurrentId] = useState(null);
 
+    const apiUrl = import.meta.env.VITE_API_KEY;
+
     // Get current ID from URL
     const getCurrentId = () => {
         const matches = location.pathname.match(/\/([^\/]+)$/);
@@ -20,7 +22,7 @@ const Aside = () => {
         const id = params.id || getCurrentId();
         if (id) {
             setCurrentId(id);
-            axios.get(`http://3.7.95.255:81/api/rental_benchmarking/get_report_data?id=${id}`)
+            axios.get(`${apiUrl}/api/rental_benchmarking/get_report_data?id=${id}`)
                 .then((response) => {
                     setCompletedStep(response.data.data.completed_step || 0);
                 })
@@ -98,7 +100,7 @@ const Aside = () => {
                 {asideData.map((item) => (
                     <li key={item.id} className={item.step > completedStep + 1 ? 'disabled' : ''}>
                         <NavLink
-                            className={({ isActive }) => 
+                            className={({ isActive }) =>
                                 `${isActive ? "active" : ""} ${item.step > completedStep + 1 ? 'disabled' : ''}`
                             }
                             to={item.path}
@@ -108,11 +110,11 @@ const Aside = () => {
                                 cursor: 'not-allowed'
                             } : {}}
                         >
-                            {item.icon && <img src={`/img/icons/${item.icon}.svg`} alt="" />} 
+                            {item.icon && <img src={`/img/icons/${item.icon}.svg`} alt="" />}
                             {item.title}
-                            {item.step > completedStep + 1 && 
+                            {item.step > completedStep + 1 &&
                                 <span className="lock-icon"></span>
-                                }
+                            }
                         </NavLink>
                     </li>
                 ))}

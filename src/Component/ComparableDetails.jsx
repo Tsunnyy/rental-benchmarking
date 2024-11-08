@@ -122,6 +122,8 @@ const ComparableDetails = () => {
   const [currentZoom, setCurrentZoom] = useState(1);
   const [activeComparable, setActiveComparable] = useState(0);
 
+  const apiUrl = import.meta.env.VITE_API_KEY;
+
   const navigate = useNavigate();
 
   let { id } = useParams();
@@ -131,7 +133,7 @@ const ComparableDetails = () => {
       const fetchData = async () => {
         setLoader(true)
         try {
-          const response = await axios.get(`http://3.7.95.255:81/api/rental_benchmarking/get_report_data?id=${id}`);
+          const response = await axios.get(`${apiUrl}/api/rental_benchmarking/get_report_data?id=${id}`);
           const data = response.data.data;
           let parsedComparableData = JSON.parse(data.comparable_details)
           const imagePath = data.assets.filter(asset => asset.type === "comparables");
@@ -563,7 +565,7 @@ const ComparableDetails = () => {
     try {
       const response = await axios({
         method: 'POST',
-        url: 'http://3.7.95.255:81/api/rental_benchmarking/save_report_data',
+        url: `${apiUrl}/api/rental_benchmarking/save_report_data`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
