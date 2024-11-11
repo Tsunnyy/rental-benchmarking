@@ -535,12 +535,12 @@ const SubjectDetsils = () => {
                                                             {index > 0 && (
                                                                 <button type="button"
                                                                     onClick={() => arrayHelpers.remove(index)}>
-                                                                    <img src="/img/icons/delete.svg" alt="delete" />
+                                                                    <img src="/rental-benchmarking/img/icons/delete.svg" alt="delete" />
                                                                 </button>
                                                             )}
                                                             <button type="button"
                                                                 onClick={() => arrayHelpers.push({ floor: '', carpet_area: '' })}>
-                                                                <img src="/img/icons/add.svg" alt="Add" />
+                                                                <img src="/rental-benchmarking/img/icons/add.svg" alt="Add" />
                                                             </button>
                                                         </div>
                                                     </div>
@@ -748,12 +748,12 @@ const SubjectDetsils = () => {
                                                             {index > 0 && (
                                                                 <button type="button"
                                                                     onClick={() => arrayHelpers.remove(index)}>
-                                                                    <img src="/img/icons/delete.svg" alt="delete" />
+                                                                    <img src="/rental-benchmarking/img/icons/delete.svg" alt="delete" />
                                                                 </button>
                                                             )}
                                                             <button type="button"
                                                                 onClick={() => arrayHelpers.push([])}>
-                                                                <img src="/img/icons/add.svg" alt="Add" />
+                                                                <img src="/rental-benchmarking/img/icons/add.svg" alt="Add" />
                                                             </button>
                                                         </div>
                                                     </div>

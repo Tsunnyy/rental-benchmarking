@@ -141,8 +141,8 @@ function App() {
       selector: row => row.action,
       cellExport: (row) => row.action,
       cell: (row) => <p className="d-flex gap-4 align-items-center action_button">
-        <button title='Edit Listing' onClick={() => editListing(row.id, row.completed_step)}><img src="/img/icons/edit.svg" alt="Edit" /></button>
-        {row.status == "Completed" ? <button title='Download Report' onClick={() => downloadReport(row.id)}><img src="/img/icons/download.svg" alt="download" /></button> : null}
+        <button title='Edit Listing' onClick={() => editListing(row.id, row.completed_step)}><img src="/rental-benchmarking/img/icons/edit.svg" alt="Edit" /></button>
+        {row.status == "Completed" ? <button title='Download Report' onClick={() => downloadReport(row.id)}><img src="/rental-benchmarking/img/icons/download.svg" alt="download" /></button> : null}
       </p>
     },
   ];
@@ -229,8 +229,8 @@ function App() {
   return (
     <>
       <Loader loader={loader} />
-      <div className={window.location.pathname != "/rental-benchmarking" ? "mainDashboard" : "mainDashboardWithoutAside"}>
-        {window.location.pathname != "/rental-benchmarking" ? <Aside /> : ""}
+      <div className={window.location.pathname == "/rental-benchmarking/" ? "mainDashboardWithoutAside" : "mainDashboard"}>
+        {window.location.pathname == "/rental-benchmarking/" ? "" : <Aside />}
         <Routes>
           <Route path="/" element={
             <div className="dasboardRightSide">

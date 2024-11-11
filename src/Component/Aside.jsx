@@ -95,7 +95,7 @@ const Aside = () => {
 
     return (
         <aside>
-            <img src="/img/logo.svg" alt="" className="logo" />
+            <img src="/rental-benchmarking/img/logo.svg" alt="" className="logo" />
             <ul>
                 {asideData.map((item) => (
                     <li key={item.id} className={item.step > completedStep + 1 ? 'disabled' : ''}>
@@ -110,7 +110,7 @@ const Aside = () => {
                                 cursor: 'not-allowed'
                             } : {}}
                         >
-                            {item.icon && <img src={`/img/icons/${item.icon}.svg`} alt="" />}
+                            {item.icon && <img src={`/rental-benchmarking/img/icons/${item.icon}.svg`} alt="" />}
                             {item.title}
                             {item.step > completedStep + 1 &&
                                 <span className="lock-icon"></span>

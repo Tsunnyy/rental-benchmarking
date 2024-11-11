@@ -64,7 +64,7 @@ function PdfReader({ url }) {
                         </div>
                         <div className="downloadButtonWithLink mt-4 mb-2 d-flex flex-column align-items-center gap-2">
                             <button onClick={downloadGeneratedPdf}>Download Report</button>
-                            {window.location.pathname !== "/" && <Link to={"/"}>Back to Home</Link>}
+                            {window.location.pathname !== "/rental-benchmarking/" && <Link to={"/"}>Back to Home</Link>}
                         </div>
                     </Document>
                 </>

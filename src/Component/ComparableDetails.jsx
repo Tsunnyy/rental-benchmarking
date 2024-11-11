@@ -680,12 +680,12 @@ const ComparableDetails = () => {
                                       <div className="icon_group">
                                         {assetIndex > 0 && (
                                           <button type="button" onClick={() => arrayHelpers.remove(assetIndex)}>
-                                            <img src="/img/icons/delete.svg" alt="delete" />
+                                            <img src="/rental-benchmarking/img/icons/delete.svg" alt="delete" />
                                           </button>
                                         )}
                                         {assetIndex === comparable.nearby_assets.length - 1 && (
                                           <button type="button" onClick={() => arrayHelpers.push('')}>
-                                            <img src="/img/icons/add.svg" alt="Add" />
+                                            <img src="/rental-benchmarking/img/icons/add.svg" alt="Add" />
                                           </button>
                                         )}
                                       </div>
