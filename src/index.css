@@ -983,3 +983,7 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   width: 1164px !important;
   height: 800px !important;
 } */
+
+.pageNotFound{
+  height: 100vh;
+}

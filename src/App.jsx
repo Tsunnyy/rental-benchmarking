@@ -16,6 +16,7 @@ import CsvDownloadButton from 'react-json-to-csv'
 import { Modal } from 'react-bootstrap';
 import { PdfReader } from './Component/PdfReader';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import PageNotFound from './Component/PageNotFound';
 
 function App() {
 
@@ -226,11 +227,13 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
+  const isPageNotFound = window.location.pathname === "*";
+
   return (
     <>
       <Loader loader={loader} />
-      <div className={window.location.pathname == "/rental-benchmarking/" ? "mainDashboardWithoutAside" : "mainDashboard"}>
-        {window.location.pathname == "/rental-benchmarking/" ? "" : <Aside />}
+      <div className={window.location.pathname == "/rental-benchmarking/" ? "mainDashboardWithoutAside" : !isPageNotFound ? "" : "mainDashboard"}>
+        {window.location.pathname == "/rental-benchmarking/" || !isPageNotFound ? "" : <Aside />}
         <Routes>
           <Route path="/" element={
             <div className="dasboardRightSide">
@@ -282,18 +285,6 @@ function App() {
               <SubjectDetsils />
             </div>
           } />
-          {/* <Route path="/comparables" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Select The Comparables" />
-              <Comparables />
-            </div>
-          } /> */}
-          {/* <Route path="/comparables/:id" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Select The Comparables" />
-              <Comparables />
-            </div>
-          } /> */}
           <Route path="/comparable-details" element={
             <div className="dasboardRightSide">
               <TopBar title="Add Subject Details" />
@@ -335,6 +326,8 @@ function App() {
               <LeafLetMap />
             </div>
           } />
+
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
 
       </div>
