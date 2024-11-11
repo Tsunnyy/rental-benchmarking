@@ -106,10 +106,11 @@ const SubjectDetsils = () => {
                         subject_nearby_assets: data.subject_nearby_assets || prev.subject_nearby_assets,
                     }));
 
-                    const imagePath = data.assets[0]?.image_path;
+                    const imagePath = data.assets.find(item => item.type === 'subject' && item.sub_type === 'main');
+                    // console.log(imagePath.image_path, "imagePath.image_path")
                     if (imagePath) {
-                        setCroppedImage(imagePath);
-                        setMainImageSrc(imagePath);
+                        setCroppedImage(imagePath.image_path);
+                        setMainImageSrc(imagePath.image_path);
                     }
 
                     const existingOtherImages = data.assets.filter(image => image.type === "subject" && image.sub_type === "other");
@@ -648,11 +649,11 @@ const SubjectDetsils = () => {
                                                             image={mainImageSrc}
                                                             crop={crop}
                                                             zoom={zoom}
-                                                            aspect={4 / 3}
+                                                            // aspect={4 / 3}
                                                             onCropChange={setCrop}
                                                             onCropComplete={onCropComplete}
                                                             onZoomChange={setZoom}
-                                                            cropSize={{ width: 500, height: 500 }}
+                                                            cropSize={{ width: 1153, height: 928 }}
                                                         />
                                                         <button
                                                             onClick={showCroppedImage}

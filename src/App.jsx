@@ -22,11 +22,18 @@ function App() {
 
   const [rowData, setrowData] = useState([])
   const [loader, setLoader] = useState(false)
-  const [sortBy, setSortBy] = useState("asc")
+  const [sortBy, setSortBy] = useState("desc")
   const [listStatus, setListStatus] = useState(2)
   const [searchData, setSearchData] = useState("")
   const [pdfUrl, setpdfUrl] = useState("")
   const [show, setShow] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [totalRows, setTotalRows] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const perPage = 20;
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -34,6 +41,38 @@ function App() {
   const apiUrl = import.meta.env.VITE_API_KEY;
 
   let navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/rental_benchmarking/check_auth`);
+        if (response.status === 200) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
+      }
+      // finally {
+      //   setLoader(false);
+      // }
+    };
+
+    checkAuth();
+  }, []);
+
+
+  const handleScroll = async (e) => {
+    const element = e.target;
+    if (
+      element.scrollHeight - element.scrollTop === element.clientHeight &&
+      hasMore &&
+      !loading
+    ) {
+      await getRowsData(page + 1, true);
+    }
+  };
 
   const editListing = (id, completed_step) => {
     console.log("completed_step of row", completed_step)
@@ -55,6 +94,7 @@ function App() {
     }
     navigate(url, { state: { editMode: true, reportId: id } });
   };
+
 
   const downloadGeneratedPdf = (url) => {
     const fileURL = url;
@@ -163,13 +203,19 @@ function App() {
     })
   }
 
+  // useEffect(() => {
+  //   getRowsData()
+  // }, [sortBy, listStatus, searchData])
   useEffect(() => {
-    getRowsData()
-  }, [sortBy, listStatus, searchData])
+    setPage(1);
+    setHasMore(true);
+    getRowsData(1, false);
+  }, [sortBy, listStatus, searchData]);
+
 
   const sortOptions = [
-    { value: 'asc', label: 'Latest First' },
-    { value: 'desc', label: 'Oldest First' },
+    { value: 'desc', label: 'Latest First' },
+    { value: 'asc', label: 'Oldest First' },
   ]
 
   const statusOptions = [
@@ -227,13 +273,14 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
+
   const isPageNotFound = window.location.pathname === "*";
 
   return (
     <>
       <Loader loader={loader} />
-      <div className={window.location.pathname == "/rental-benchmarking/" ? "mainDashboardWithoutAside" : !isPageNotFound ? "" : "mainDashboard"}>
-        {window.location.pathname == "/rental-benchmarking/" || !isPageNotFound ? "" : <Aside />}
+      <div className={window.location.pathname == "/rental-benchmarking/" || window.location.pathname == "/rental-benchmarking" ? "mainDashboardWithoutAside" : "mainDashboard"}>
+        {window.location.pathname == "/rental-benchmarking/" || window.location.pathname == "/rental-benchmarking" ? "" : <Aside />}
         <Routes>
           <Route path="/" element={
             <div className="dasboardRightSide">
@@ -256,16 +303,20 @@ function App() {
                       <button onClick={downloadCsvFild}>Export</button>
                     </div>
                   </div>
-                  <DataTable
-                    columns={columns}
-                    data={rowData}
-                    // onRowClicked={}
-                    noHeader
-                    defaultSortField="id"
-                    defaultSortAsc={false}
-                    // pagination
-                    highlightOnHover
-                  />
+                  <div className='infinite-scroll' onScroll={handleScroll}>
+                    <DataTable
+                      columns={columns}
+                      data={rowData}
+                      // onRowClicked={}
+                      noHeader
+                      defaultSortField="id"
+                      defaultSortAsc={false}
+                      // pagination
+                      highlightOnHover
+                      progressPending={loading}
+                      progressComponent={<Loader />}
+                    />
+                  </div>
                 </div>
                 <div className="dataTableWithMapR">
                   <LeafLetMap />
@@ -327,6 +378,7 @@ function App() {
             </div>
           } />
 
+          {isAuthenticated == false && <Route element={<PageNotFound />} />}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
 

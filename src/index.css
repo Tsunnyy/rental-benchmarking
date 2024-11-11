@@ -678,6 +678,8 @@ form .formGridParent .customInputBox input {
   font-weight: 400;
   line-height: 14.7px;
   color: #333333;
+  min-width: unset;
+  max-width: 170px;
 }
 
 .rdt_Table .rdt_TableRow div[data-tag="allowRowEvents"] .clrBlue {
@@ -900,7 +902,7 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   overflow: hidden;
 }
 
-.modal .modal-content{
+.modal .modal-content {
   width: 76%;
 }
 
@@ -967,7 +969,7 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   text-decoration: none;
 }
 
-.modal-header button{
+.modal-header button {
   border-radius: 100%;
   background: #F5F5F5;
   /* justify-content: space-between; */
@@ -984,6 +986,25 @@ form:has(.comparePageGrid.formGridParent.withNoGrid) {
   height: 800px !important;
 } */
 
-.pageNotFound{
+.pageNotFound {
   height: 100vh;
+}
+
+.infinite-scroll {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #1C6FF4;
 }

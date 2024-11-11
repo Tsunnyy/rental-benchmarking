@@ -741,7 +741,7 @@ const ComparableDetails = () => {
                                           zoom={currentZoom}
                                           aspect={5 / 2}
                                           // setCropSize={100}
-                                          // cropSize={width: "1153px", height: "512px" }
+                                          cropSize={{ width: 1153, height: 512 }}
                                           onCropChange={setCurrentCrop}
                                           onCropComplete={onCropComplete}
                                           onZoomChange={setCurrentZoom}
