@@ -62,6 +62,9 @@ function App() {
     checkAuth();
   }, []);
 
+  if (isAuthenticated === false) {
+    return <PageNotFound />
+  }
 
   const handleScroll = async (e) => {
     const element = e.target;
@@ -211,7 +214,6 @@ function App() {
     setHasMore(true);
     getRowsData(1, false);
   }, [sortBy, listStatus, searchData]);
-
 
   const sortOptions = [
     { value: 'desc', label: 'Latest First' },

@@ -68,6 +68,7 @@ const Aside = () => {
             id: 5,
             title: "Recommended Rentals",
             path: currentId ? `/recommended-rentals/${currentId}` : "/recommended-rentals",
+            icon: "rental",
             step: 4
         }
     ];
