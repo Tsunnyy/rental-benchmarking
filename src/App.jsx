@@ -20,23 +20,17 @@ import PageNotFound from './Component/PageNotFound';
 
 function App() {
 
-  const [rowData, setrowData] = useState([])
+  const [rowData, setRowData] = useState([])
   const [loader, setLoader] = useState(false)
   const [sortBy, setSortBy] = useState("desc")
   const [listStatus, setListStatus] = useState(2)
   const [searchData, setSearchData] = useState("")
   const [pdfUrl, setpdfUrl] = useState("")
   const [show, setShow] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const [page, setPage] = useState(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const perPage = 20;
-
+  const [pageNumber, setPageNumber] = useState(1);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   const apiUrl = import.meta.env.VITE_API_KEY;
 
@@ -54,28 +48,16 @@ function App() {
       } catch (error) {
         setIsAuthenticated(false);
       }
-      // finally {
-      //   setLoader(false);
-      // }
     };
 
     checkAuth();
   }, []);
 
-  if (isAuthenticated === false) {
-    return <PageNotFound />
-  }
-
-  const handleScroll = async (e) => {
-    const element = e.target;
-    if (
-      element.scrollHeight - element.scrollTop === element.clientHeight &&
-      hasMore &&
-      !loading
-    ) {
-      await getRowsData(page + 1, true);
-    }
-  };
+  // useEffect(() => {
+  // if (isAuthenticated === false) {
+  //   return <PageNotFound />
+  // }
+  // }, []);
 
   const editListing = (id, completed_step) => {
     console.log("completed_step of row", completed_step)
@@ -97,7 +79,6 @@ function App() {
     }
     navigate(url, { state: { editMode: true, reportId: id } });
   };
-
 
   const downloadGeneratedPdf = (url) => {
     const fileURL = url;
@@ -191,30 +172,6 @@ function App() {
     },
   ];
 
-  const getRowsData = () => {
-    setLoader(true)
-    axios.get(`${apiUrl}/api/rental_benchmarking/list_reports?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`).then((response) => {
-      let responseData = response.data.data
-      console.log(responseData, "data")
-      responseData.map((val) => {
-        val.status == 0 ? val.status = "Ongoing" : val.status = "Completed"
-        return val;
-      })
-      setrowData(responseData)
-    }).finally(() => {
-      setLoader(false)
-    })
-  }
-
-  // useEffect(() => {
-  //   getRowsData()
-  // }, [sortBy, listStatus, searchData])
-  useEffect(() => {
-    setPage(1);
-    setHasMore(true);
-    getRowsData(1, false);
-  }, [sortBy, listStatus, searchData]);
-
   const sortOptions = [
     { value: 'desc', label: 'Latest First' },
     { value: 'asc', label: 'Oldest First' },
@@ -229,23 +186,77 @@ function App() {
   const sortFunction = (e) => {
     console.log(e.value, "e.value")
     setSortBy(e.value)
+    setPageNumber(1);
   }
 
   const statusFunction = (e) => {
     console.log(e.value, "e.value");
     setListStatus(e.value);
+    setPageNumber(1);
   };
 
   const searchByClientName = (e) => {
     if (e.target.value.length >= 3) {
       const getData = setTimeout(() => {
         setSearchData(e.target.value)
+        setPageNumber(1);
       }, 1000);
       return () => clearTimeout(getData);
     } else {
       setSearchData("")
     }
   }
+
+  const getRowsData = () => {
+    setLoader(true);
+    axios
+      .get(
+        `${apiUrl}/api/rental_benchmarking/list_reports?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}&pageNumber=${pageNumber}`
+      )
+      .then((response) => {
+        const responseData = response.data.data;
+        console.log(responseData, 'data');
+
+        const updatedData = responseData.map((val) => {
+          val.status = val.status === 0 ? 'Ongoing' : 'Completed';
+          return val;
+        });
+
+        if (pageNumber === 1) {
+          setRowData(updatedData);
+        } else {
+          setRowData((prevData) => [...prevData, ...updatedData]);
+        }
+
+        if (responseData.length < 10) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  useEffect(() => {
+    getRowsData();
+  }, [sortBy, listStatus, searchData, pageNumber]);
+
+  const handleScroll = (e) => {
+    const element = e.target;
+
+    // Check if we've scrolled to the bottom
+    if (
+      element.scrollHeight - element.scrollTop === element.clientHeight &&
+      hasMore &&
+      !loader
+    ) {
+      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      // getRowsData();
+    }
+  };
+
 
   const downloadCsvFild = async () => {
     const response = await axios.get(`${apiUrl}/api/rental_benchmarking/export?sortOrder=${sortBy}&q=${searchData}&status=${listStatus}`)
@@ -284,103 +295,112 @@ function App() {
       <div className={window.location.pathname == "/rental-benchmarking/" || window.location.pathname == "/rental-benchmarking" ? "mainDashboardWithoutAside" : "mainDashboard"}>
         {window.location.pathname == "/rental-benchmarking/" || window.location.pathname == "/rental-benchmarking" ? "" : <Aside />}
         <Routes>
-          <Route path="/" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Rental Benchmarking" />
-              <div className="dataTableWithMap">
-                <div className="dataTableWithMapL">
-                  <div className="dashboardFilters row m-0 align-items-center justify-content-between mb-4">
-                    <div className="dashboardFiltersL col-sm-5 p-0">
-                      <input type="text" name="search" onChange={(e) => searchByClientName(e)} placeholder='Search' />
-                    </div>
-                    <div className="dashboardFiltersR col-sm-6 p-0">
-                      <div className="selectWithLabel">
-                        <label htmlFor="sortBy">Sort By :</label>
-                        <Select onChange={(e) => sortFunction(e)} isSearchable={false} defaultValue={sortOptions[0]} options={sortOptions} className='reactSelect' classNamePrefix="reactSelectInner" />
+          {isAuthenticated == false ? (
+            <>
+              <Route path="*" element={<PageNotFound />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Rental Benchmarking" />
+                  <div className="dataTableWithMap">
+                    <div className="dataTableWithMapL">
+                      <div className="dashboardFilters row m-0 align-items-center justify-content-between mb-4">
+                        <div className="dashboardFiltersL col-sm-5 p-0">
+                          <input type="text" name="search" onChange={(e) => searchByClientName(e)} placeholder='Search' />
+                        </div>
+                        <div className="dashboardFiltersR col-sm-6 p-0">
+                          <div className="selectWithLabel">
+                            <label htmlFor="sortBy">Sort By :</label>
+                            <Select onChange={(e) => sortFunction(e)} isSearchable={false} defaultValue={sortOptions[0]} options={sortOptions} className='reactSelect' classNamePrefix="reactSelectInner" />
+                          </div>
+                          <div className="selectWithLabel">
+                            <label htmlFor="status">Status :</label>
+                            <Select onChange={(e) => statusFunction(e)} isSearchable={false} defaultValue={statusOptions[2]} options={statusOptions} className='reactSelect' classNamePrefix="reactSelectInner" />
+                          </div>
+                          <button onClick={downloadCsvFild}>Export</button>
+                        </div>
                       </div>
-                      <div className="selectWithLabel">
-                        <label htmlFor="status">Status :</label>
-                        <Select onChange={(e) => statusFunction(e)} isSearchable={false} defaultValue={statusOptions[2]} options={statusOptions} className='reactSelect' classNamePrefix="reactSelectInner" />
+                      <div className='infinite-scroll' onScroll={handleScroll}>
+                        {/* <div className='infinite-scroll'> */}
+                        <DataTable
+                          columns={columns}
+                          data={rowData}
+                          // onRowClicked={}
+                          noHeader
+                          defaultSortField="id"
+                          defaultSortAsc={false}
+                          // pagination
+                          highlightOnHover
+                          progressPending={loader}
+                          progressComponent={<Loader />}
+                        />
                       </div>
-                      <button onClick={downloadCsvFild}>Export</button>
                     </div>
-                  </div>
-                  <div className='infinite-scroll' onScroll={handleScroll}>
-                    <DataTable
-                      columns={columns}
-                      data={rowData}
-                      // onRowClicked={}
-                      noHeader
-                      defaultSortField="id"
-                      defaultSortAsc={false}
-                      // pagination
-                      highlightOnHover
-                      progressPending={loading}
-                      progressComponent={<Loader />}
-                    />
+                    <div className="dataTableWithMapR">
+                      <LeafLetMap />
+                    </div>
                   </div>
                 </div>
-                <div className="dataTableWithMapR">
+              } />
+              <Route path="/subject-property" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Add Subject Details" />
+                  <SubjectDetsils />
+                </div>
+              } />
+              <Route path="/subject-property/:id" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Add Subject Details" />
+                  <SubjectDetsils />
+                </div>
+              } />
+              <Route path="/comparable-details" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Add Subject Details" />
+                  <ComparableDetails />
+                </div>
+              } />
+              <Route path="/comparable-details/:id" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Add Subject Details" />
+                  <ComparableDetails />
+                </div>
+              } />
+              <Route path="/site-lease-terms" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Subject Site Lease Terms" />
+                  <SubjectSiteLeaseTerms />
+                </div>
+              } />
+              <Route path="/site-lease-terms/:id" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="Subject Site Lease Terms" />
+                  <SubjectSiteLeaseTerms />
+                </div>
+              } />
+              <Route path="/recommended-rentals" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="CRE Matrix Recommended Rentals" />
+                  <RecommendedRentals />
+                </div>
+              } />
+              <Route path="/recommended-rentals/:id" element={
+                <div className="dasboardRightSide">
+                  <TopBar title="CRE Matrix Recommended Rentals" />
+                  <RecommendedRentals />
+                </div>
+              } />
+              <Route path="/map" element={
+                <div className="dasboardRightSide">
                   <LeafLetMap />
                 </div>
-              </div>
-            </div>
-          } />
-          <Route path="/subject-property" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Add Subject Details" />
-              <SubjectDetsils />
-            </div>
-          } />
-          <Route path="/subject-property/:id" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Add Subject Details" />
-              <SubjectDetsils />
-            </div>
-          } />
-          <Route path="/comparable-details" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Add Subject Details" />
-              <ComparableDetails />
-            </div>
-          } />
-          <Route path="/comparable-details/:id" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Add Subject Details" />
-              <ComparableDetails />
-            </div>
-          } />
-          <Route path="/site-lease-terms" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Subject Site Lease Terms" />
-              <SubjectSiteLeaseTerms />
-            </div>
-          } />
-          <Route path="/site-lease-terms/:id" element={
-            <div className="dasboardRightSide">
-              <TopBar title="Subject Site Lease Terms" />
-              <SubjectSiteLeaseTerms />
-            </div>
-          } />
-          <Route path="/recommended-rentals" element={
-            <div className="dasboardRightSide">
-              <TopBar title="CRE Matrix Recommended Rentals" />
-              <RecommendedRentals />
-            </div>
-          } />
-          <Route path="/recommended-rentals/:id" element={
-            <div className="dasboardRightSide">
-              <TopBar title="CRE Matrix Recommended Rentals" />
-              <RecommendedRentals />
-            </div>
-          } />
-          <Route path="/map" element={
-            <div className="dasboardRightSide">
-              <LeafLetMap />
-            </div>
-          } />
+              } />
+            </>
+          )}
 
-          {isAuthenticated == false && <Route element={<PageNotFound />} />}
+          {/* {isAuthenticated == false && <Route element={<PageNotFound />} />} */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>
 
